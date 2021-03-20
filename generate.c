@@ -135,6 +135,12 @@ main(int argc, char *argv[])
 		readinput.len -= parseinput.len;
 	}
 
+	int i;
+	for (i = 0; i < vss; ++i)
+		printf(" * [%d]: %.*s = \"%.*s\"\n", i,
+				vs[i].name.len,  vs[i].name.data,
+				vs[i].value.len, vs[i].value.data);
+
 	/* Closing an input */
 	close(inputfd);
 
