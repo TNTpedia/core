@@ -1,0 +1,25 @@
+kocotian
+========
+
+Static page generator for my webpage wrote in C99.
+
+Usage
+=====
+generate (generate.c) takes minimum one argument:
+* first argument is a file with content.
+* second, optional argument is a template. Optional, because content can
+  contain template variable.
+
+generate is used by Makefile
+
+Structure
+=========
+Content is just content, but it can also contain variables. Variable is
+a line starting with @, followed by variable name (single word) and variable
+content (anything until new line).
+Examples:
+	@title My title
+	@template blog
+
+Template is HTML code, but can write nested code surrounded by `%` signs (like
+in node.c by Tsoding).
