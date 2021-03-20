@@ -6,8 +6,18 @@ typedef struct {
 	size_t len;
 } String;
 
+static String toString(char *s);
 static int Strcmp(String a, String b);
 static ssize_t Strtok(String string, String *out, char c);
+static String Strtrim(String str);
+
+static String
+toString(char *s)
+{
+	String ret;
+	ret.len = (ret.data = s);
+	return ret;
+}
 
 static int
 Strcmp(String a, String b)
