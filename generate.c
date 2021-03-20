@@ -9,7 +9,11 @@
 #include "util.h"
 
 /* Macros */
-#define $(VARNAME) getVariableName(#VARNAME)
+#define $(VARNAME) getVariableValue(#VARNAME)
+#define DECLVAR(VARNAME, VALUE) \
+	(vs[vss].name.len = strlen(vs[vss].name.data = #VARNAME), \
+	 vs[vss].value.len = strlen(vs[vss].value.data = VALUE), \
+	 ++vss)
 #define BUFFER_SIZE 64 * 1024
 #define VS_MAX 256
 
@@ -102,6 +106,10 @@ main(int argc, char *argv[])
 	/* Initially, readinput points to beginning of all input */
 	readinput.data = input.data;
 	readinput.len = input.len;
+
+	/* Declaring a few variables */
+	DECLVAR(title, outputfn);
+	DECLVAR(template, templatefn == NULL ? "none" : templatefn);
 
 	/* Parsing ("preprocessing") input for variables */
 	if ((rb = read(inputfd, idata, BUFFER_SIZE)) < 0)
