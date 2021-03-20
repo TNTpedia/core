@@ -1,7 +1,10 @@
-kocotian
-========
+stacinhtml
+==========
 
-Static page generator for my webpage wrote in C99.
+Static C in HTML is a page generator wrote in C99 initially for my webpage.
+This is a simple "compiler" that takes HTML with nested C code on input, and
+produces HTML on output. Input and nesting C code was inspired by node.c
+created by Tsoding (https://github.com/tsoding/node.c).
 
 Usage
 =====
@@ -21,8 +24,8 @@ Examples:
 	@title My title
 	@template blog
 
-Template is HTML code, but can write nested code surrounded by `%` signs (like
-in node.c by Tsoding). For example, this will print "Hello!" 255 times:
+Template is HTML code, but can write nested code surrounded by `%` signs.
+For example, this will print "Hello!" 255 times:
 
 	<!DOCTYPE html>
 	%for (int i = 0; i < 255; ++i) {%
