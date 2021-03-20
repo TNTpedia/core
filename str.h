@@ -28,4 +28,18 @@ Strtok(String string, String *out, char c)
 	return (tmpptr - string.data);
 }
 
+static String
+Strtrim(String str)
+{
+	int i = 0;
+	while (isspace(*(str.data)) && i < str.len) {
+		++str.data;
+		--str.len;
+		++i;
+	}
+	while (isspace(*(str.data + (str.len - 1))))
+		--str.len;
+	return str;
+}
+
 #endif

@@ -118,10 +118,12 @@ main(int argc, char *argv[])
 				String tok;
 				if (Strtok(readinput, &tok, '=') <= 0)
 					/* TODO: return syntax error */;
-				vs[vss].name.data = tok.data;
+				vs[vss].name.data = (idata + (parseinput.data - idata) + 1);
 				vs[vss].name.len = tok.len;
-				vs[vss].value.data = readinput.data + (tok.len + 1);
-				vs[vss].value.len = readinput.len - (tok.len + 1);
+				vs[vss].value.data = (idata + (parseinput.data - idata) + 1) + (tok.len + 1);
+				vs[vss].value.len = parseinput.len - (tok.len + 1) - 1;
+				vs[vss].name = Strtrim(vs[vss].name);
+				vs[vss].value = Strtrim(vs[vss].value);
 				++vss;
 			}
 			--readinput.data;
