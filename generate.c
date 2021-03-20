@@ -39,8 +39,8 @@ getVariableValue(char *v)
 {
 	size_t n;
 	String s = { .data = v, .len = strlen(v) };
-	n = -1;
-	while (++n < vss) {
+	n = vss;
+	while (--n >= 0) {
 		if (!Strcmp(vs[n].name, s))
 			return vs[n].value;
 	}
