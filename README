@@ -22,4 +22,9 @@ Examples:
 	@template blog
 
 Template is HTML code, but can write nested code surrounded by `%` signs (like
-in node.c by Tsoding).
+in node.c by Tsoding). For example, this will print "Hello!" 255 times:
+
+	<!DOCTYPE html>
+	%for (int i = 0; i < 255; ++i) {%
+		Hello!
+	%}%
