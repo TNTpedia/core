@@ -1,45 +1,45 @@
 #include <fcntl.h>
+#include <string.h>
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <unistd.h>
-#include <stdio.h>
 
 #include "arg.h"
+#include "str.h"
 #include "util.h"
 
 /* Macros */
-#define $(VARNAME) /* TODO: implement something getting variable */ #VARNAME
+#define $(VARNAME) getVariableName(#VARNAME)
 #define BUFFER_SIZE 64 * 1024
+#define VS_MAX 256
 
 /* Types */
-typedef struct {
-	char *data;
-	size_t len;
-} String;
-
 typedef struct {
 	String name;
 	String value;
 } Variable;
 
 /* Prototypes */
-static ssize_t newline(String string);
+static String getVariableValue(char *varname);
 static void usage(void);
 
 /* Globals */
 char *argv0;
 
+Variable vs[VS_MAX]; /* Variable stack */
+size_t vss; /* Variable stack size */
+
 /* Functions */
-static ssize_t
-Strline(String string, String *out)
+static String
+getVariableValue(char *v)
 {
-	char *tmpptr = string.data;
-	while ((tmpptr - string.data) < string.len) {
-		if (*(++tmpptr) == '\n') break;
+	size_t n;
+	String s = { .data = v, .len = strlen(v) };
+	n = -1;
+	while (++n < vss) {
+		if (!Strcmp(vs[n].name, s))
+			return vs[n].value;
 	}
-	string.len = tmpptr - string.data;
-	*out = string;
-	return (tmpptr - string.data);
 }
 
 static void
@@ -61,8 +61,8 @@ main(int argc, char *argv[])
 	ssize_t rb;
 
 	/* Input data */
-	char input_buf[BUFFER_SIZE], idata[BUFFER_SIZE], *idata_ptr;
-	idata_ptr = idata;
+	char input_buf[BUFFER_SIZE], idata[BUFFER_SIZE];
+
 	String input = {
 		.data = input_buf,
 		.len = 0
@@ -96,6 +96,9 @@ main(int argc, char *argv[])
 	/* Zeroing first byte of input data */
 	*(input.data) = '\0';
 
+	/* Setting variable stack size to 0 */
+	vss = 0;
+
 	/* Initially, readinput points to beginning of all input */
 	readinput.data = input.data;
 	readinput.len = input.len;
@@ -107,9 +110,25 @@ main(int argc, char *argv[])
 	readinput.data = idata;
 	readinput.len  = rb;
 
-	fprintf(stderr, "=== INPUT: ===\n%s\n==============\n", idata);
-
-	while (Strline(readinput, &parseinput)) {
+	while (Strtok(readinput, &parseinput, '\n') > 0) {
+		if (*(readinput.data) == '@' && *(readinput.data + 1) != '@') {
+			++readinput.data;
+			if (*(readinput.data) == '#'); /* comment */
+			else { /* variable */
+				String tok;
+				if (Strtok(readinput, &tok, '=') <= 0)
+					/* TODO: return syntax error */;
+				vs[vss].name.data = tok.data;
+				vs[vss].name.len = tok.len;
+				vs[vss].value.data = readinput.data + (tok.len + 1);
+				vs[vss].value.len = readinput.len - (tok.len + 1);
+				++vss;
+			}
+			--readinput.data;
+		} else {
+			strncat(input.data, readinput.data, MIN(BUFFER_SIZE - input.len, parseinput.len + 1));
+			input.len += parseinput.len;
+		}
 		readinput.data += parseinput.len + 1;
 		readinput.len -= parseinput.len;
 	}
