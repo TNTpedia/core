@@ -13,4 +13,4 @@ LDFLAGS  = -Ofast -static
 CCFLAGS  = ${CFLAGS} ${CPPFLAGS}
 
 # compiler
-CC = cc
+CC = gcc
