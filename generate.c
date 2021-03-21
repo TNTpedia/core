@@ -193,6 +193,9 @@ main(int argc, char *argv[])
 	if ((outputfd = open(outputfn, O_WRONLY | O_CREAT, 0644)) < 0)
 		die("open (output):");
 
+	/* Writing beginning of main() */
+	write(outputfd, "#include <assemble.h>\nint main(void) {", 38);
+
 	/* Declaring variables */
 	for (viter = 0; viter < vss; ++viter)
 		dprintf(outputfd, "DECLVAR(%.*s, \"%.*s\"); ",
@@ -201,6 +204,9 @@ main(int argc, char *argv[])
 
 	/* And finally, generating C code to output */
 	generateC(outputfd, input);
+
+	/* After this, closing main() */
+	write(outputfd, "\n}", 2);
 
 	/* Closing an output */
 	close(outputfd);

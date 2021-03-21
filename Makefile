@@ -15,7 +15,7 @@ OBJLIB = ${SRCLIB:.c=.o}
 SRC = generate.c
 EXE = ${SRC:.c=}
 
-generator: buildoptions ${EXE}
+generator: buildoptions ${EXE} assemble.o
 
 buildoptions:
 	@echo build options:
@@ -36,29 +36,27 @@ ${OBJLIB}: ${SRCLIB}
 %: %.c ${OBJLIB}
 	${CC} ${CCFLAGS} ${LDFLAGS} -o $@ $^
 
-clean:
-	rm -f ${OBJLIB} ${EXE}
-
-.PHONY: clean
-
 # == Section 2: Generating pages ==
 
-INDIR = in
+INDIR = in/
 INDIRS = $(sort $(shell find $(INDIR)/ -type d))
 IN = $(sort $(shell find $(INDIR)/ -type f -name '*.stac'))
 
-METADIR = meta
+METADIR = meta/
 METADIRS = $(subst $(INDIR),$(METADIR),$(INDIRS))
 META = $(subst $(INDIR),$(METADIR),$(IN:.stac=.c))
 BIN = $(META:.c=.bin)
 
-OUTDIR = out
+OUTDIR = out/
 OUTDIRS = $(subst $(METADIR),$(OUTDIR),$(METADIRS))
-OUT = $(subst $(METADIR),$(OUTDIR),$(META:.bin=.html))
+OUT = $(subst $(METADIR),$(OUTDIR),$(BIN:.bin=.html))
 
 GENERATOR = ./generate
 
-pages: generator ${OUT} ${GENERATOR}
+pages: genpages
+	rm -rf ${METADIR}
+
+genpages: ${OUT}
 
 ${OUT}: ${META}
 ${META}: mkpagedirs
@@ -66,13 +64,19 @@ ${META}: mkpagedirs
 mkpagedirs: ${IN}
 	mkdir -p $(OUTDIRS) $(METADIRS)
 
+${IN}: generator ${GENERATOR}
+
 ${META}: ${IN}
 	${GENERATOR} -o $@ $(subst $(METADIR),$(INDIR),$(@:.c=.stac))
 
-%.bin: %.c
-	${CC} -o $@ $(@:.bin=.c)
+${BIN}: ${META}
+	${CC} -o $@ -I. $(@:.bin=.c) assemble.o
 
 ${OUT}: ${BIN}
-	${GENERATOR} -o $@ $(subst $(OUTDIR),$(BINDIR),$(@:.html=.bin))
+	./$(subst $(OUTDIR),$(METADIR),$(@:.html=.bin)) > $@
 
-.PHONY: mkpagedirs
+clean:
+	rm -f ${OBJLIB} ${EXE} *.o
+	rm -rf ${METADIR} ${OUTDIR}
+
+.PHONY: mkpagedirs clean
