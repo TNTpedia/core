@@ -1,27 +1,32 @@
-# == Section 0: Includes ==
+# == Section 0: Includes and basic dependencies ==
 
 include config.mk
 
-# == Section 1: Generating a generator ==
+all: pages
+pages: generator
+
+.PHONY: all pages generator
+
+# == Section 1: Building a generator ==
 
 SRCLIB = util.c
 OBJLIB = ${SRCLIB:.c=.o}
 
 SRC = generate.c
-BIN = ${SRC:.c=}
+EXE = ${SRC:.c=}
 
-all: options ${BIN}
+generator: buildoptions ${EXE}
 
-options:
+buildoptions:
 	@echo build options:
 	@echo "CFLAGS       = ${CFLAGS}"
 	@echo "CPPFLAGS     = ${CPPFLAGS}"
 	@echo "LDFLAGS      = ${LDFLAGS}"
 	@echo "CC           = ${CC}"
 
-${BIN}: ${SRC}
+${EXE}: ${SRC}
 
-${BIN}: ${OBJLIB}
+${EXE}: ${OBJLIB}
 
 ${OBJLIB}: ${SRCLIB}
 
@@ -32,8 +37,42 @@ ${OBJLIB}: ${SRCLIB}
 	${CC} ${CCFLAGS} ${LDFLAGS} -o $@ $^
 
 clean:
-	rm -f ${OBJLIB} ${BIN}
+	rm -f ${OBJLIB} ${EXE}
 
-.PHONY: all clean
+.PHONY: clean
 
 # == Section 2: Generating pages ==
+
+INDIR = in
+INDIRS = $(sort $(shell find $(INDIR)/ -type d))
+IN = $(sort $(shell find $(INDIR)/ -type f -name '*.stac'))
+
+METADIR = meta
+METADIRS = $(subst $(INDIR),$(METADIR),$(INDIRS))
+META = $(subst $(INDIR),$(METADIR),$(IN:.stac=.c))
+BIN = $(META:.c=.bin)
+
+OUTDIR = out
+OUTDIRS = $(subst $(METADIR),$(OUTDIR),$(METADIRS))
+OUT = $(subst $(METADIR),$(OUTDIR),$(META:.bin=.html))
+
+GENERATOR = ./generate
+
+pages: generator ${OUT} ${GENERATOR}
+
+${OUT}: ${META}
+${META}: mkpagedirs
+
+mkpagedirs: ${IN}
+	mkdir -p $(OUTDIRS) $(METADIRS)
+
+${META}: ${IN}
+	${GENERATOR} -o $@ $(subst $(METADIR),$(INDIR),$(@:.c=.stac))
+
+%.bin: %.c
+	${CC} -o $@ $(@:.bin=.c)
+
+${OUT}: ${BIN}
+	${GENERATOR} -o $@ $(subst $(OUTDIR),$(BINDIR),$(@:.html=.bin))
+
+.PHONY: mkpagedirs
