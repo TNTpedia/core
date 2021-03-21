@@ -1,6 +1,8 @@
 #ifndef _STR_H
 #define _STR_H
 
+#include <ctype.h>
+
 typedef struct {
 	char *data;
 	size_t len;
