@@ -24,6 +24,8 @@ typedef struct {
 } Variable;
 
 /* Prototypes */
+static void generateCode(int fd, String input, int c_mode);
+static void generateC(int fd, String input);
 static String getVariableValue(char *varname);
 static void usage(void);
 
@@ -34,6 +36,45 @@ Variable vs[VS_MAX]; /* Variable stack */
 size_t vss; /* Variable stack size */
 
 /* Functions */
+static void
+generateCode(int fd, String input, int c_mode)
+{
+	if (c_mode) {
+		write(fd, input.data, input.len);
+	} else {
+		int i = -1;
+		write(fd, "write(fd, \"", 11);
+		while (++i < input.len) {
+			if (*input.data == '\n')
+				dprintf(fd, "\"\n\"");
+			dprintf(fd, "\\x%02x", *(input.data++));
+		}
+		dprintf(fd, "\", %d);", input.len);
+	}
+}
+
+static void
+generateC(int fd, String input)
+{
+	int c_mode, i, li;
+	String ibuf;
+	c_mode = 0;
+
+	ibuf.data = input.data;
+	ibuf.len = input.len;
+	for (i = 0; i < input.len; ++i) {
+		if (input.data[i] == '%') {
+			ibuf.len = ++i - li - 1;
+			generateCode(fd, ibuf, c_mode);
+			ibuf.data = input.data + i;
+			ibuf.len = input.len - i;
+			c_mode = !c_mode;
+			li = i;
+		}
+	}
+	generateCode(fd, ibuf, c_mode);
+}
+
 static String
 getVariableValue(char *v)
 {
@@ -59,7 +100,7 @@ main(int argc, char *argv[])
 	/* Variables: */
 	/* File names and file descriptors */
 	char *inputfn = NULL, *outputfn = NULL, *templatefn = NULL;
-	int inputfd, templatefd;
+	int inputfd, outputfd, templatefd;
 
 	/* Read bytes (from nextline()/write()) */
 	ssize_t rb;
@@ -95,7 +136,7 @@ main(int argc, char *argv[])
 
 	/* Opening an input */
 	if ((inputfd = open(inputfn, O_RDONLY)) < 0)
-		die("open:");
+		die("open (input):");
 
 	/* Zeroing first byte of input data */
 	*(input.data) = '\0';
@@ -151,6 +192,18 @@ main(int argc, char *argv[])
 
 	/* Closing an input */
 	close(inputfd);
+
+	/* Here will be some templates replacing */
+
+	/* Opening an output */
+	if ((outputfd = open(outputfn, O_WRONLY | O_CREAT)) < 0)
+		die("open (output):");
+
+	/* And finally, generating C code to output */
+	generateC(outputfd, input);
+
+	/* Closing an output */
+	close(outputfd);
 
 	return 0;
 }
