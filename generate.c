@@ -100,7 +100,7 @@ main(int argc, char *argv[])
 	/* Variables: */
 	/* File names and file descriptors */
 	char *inputfn = NULL, *outputfn = NULL, *templatefn = NULL;
-	int inputfd, outputfd, templatefd;
+	int inputfd, outputfd, templatefd, viter;
 
 	/* Read bytes (from nextline()/write()) */
 	ssize_t rb;
@@ -184,20 +184,20 @@ main(int argc, char *argv[])
 		readinput.len -= parseinput.len;
 	}
 
-	int i;
-	for (i = 0; i < vss; ++i)
-		printf(" * [%d]: %.*s = \"%.*s\"\n", i,
-				vs[i].name.len,  vs[i].name.data,
-				vs[i].value.len, vs[i].value.data);
-
 	/* Closing an input */
 	close(inputfd);
 
 	/* Here will be some templates replacing */
 
 	/* Opening an output */
-	if ((outputfd = open(outputfn, O_WRONLY | O_CREAT)) < 0)
+	if ((outputfd = open(outputfn, O_WRONLY | O_CREAT, 0644)) < 0)
 		die("open (output):");
+
+	/* Declaring variables */
+	for (viter = 0; viter < vss; ++viter)
+		dprintf(outputfd, "DECLVAR(%.*s, \"%.*s\"); ",
+				vs[viter].name.len,  vs[viter].name.data,
+				vs[viter].value.len, vs[viter].value.data);
 
 	/* And finally, generating C code to output */
 	generateC(outputfd, input);
