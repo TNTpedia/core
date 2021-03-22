@@ -53,26 +53,24 @@ OUT = $(subst $(METADIR),$(OUTDIR),$(BIN:.bin=.html))
 
 GENERATOR = ./generate
 
-pages: genpages
-	rm -rf ${METADIR}
-
-genpages: ${OUT}
+pages: ${OUT}
 
 ${OUT}: ${META}
-${META}: mkpagedirs
+${META}: ${IN}
+${IN}: mkpagedirs
 
-mkpagedirs: ${IN}
+mkpagedirs:
 	mkdir -p $(OUTDIRS) $(METADIRS)
 
 ${IN}: generator ${GENERATOR}
 
-${META}: ${IN}
+${METADIR}/%.c: ${INDIR}/%.stac
 	${GENERATOR} -o $@ $(subst $(METADIR),$(INDIR),$(@:.c=.stac))
 
-${BIN}: ${META}
+${METADIR}/%.bin: ${METADIR}/%.c
 	${CC} -o $@ -I. $(@:.bin=.c) assemble.o
 
-${OUT}: ${BIN}
+${OUTDIR}/%.html: ${METADIR}/%.bin
 	./$(subst $(OUTDIR),$(METADIR),$(@:.html=.bin)) > $@
 
 clean:
