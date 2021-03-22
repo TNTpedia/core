@@ -37,7 +37,7 @@ static String
 toString(char *s)
 {
 	String ret;
-	ret.len = (ret.data = s);
+	ret.len = strlen(ret.data = s);
 	return ret;
 }
 
