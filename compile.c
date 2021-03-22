@@ -208,7 +208,7 @@ main(int argc, char *argv[])
 
 	/* Declaring a few variables */
 	DECLVAR(title, outputfn);
-	DECLVAR(template, templatefn == NULL ? "none" : templatefn);
+	DECLVAR(template, templatefn);
 
 	/* Parsing ("preprocessing") input for variables */
 	if ((rb = read(inputfd, idata, BUFFER_SIZE)) < 0)

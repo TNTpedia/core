@@ -31,7 +31,7 @@
 #define $$(VARNAME) write(fd, $(VARNAME).data, $(VARNAME).len);
 #define DECLVAR(VARNAME, VALUE) \
 	(vs[vss].name.len = strlen(vs[vss].name.data = #VARNAME), \
-	 vs[vss].value.len = strlen(vs[vss].value.data = VALUE), \
+	 vs[vss].value.len = strlen(vs[vss].value.data = VALUE == NULL ? "<null>" : VALUE), \
 	 ++vss)
 #define VS_MAX 256
 #define fd 1 /* stdout */
