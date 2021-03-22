@@ -18,6 +18,8 @@
 
 */
 
+#define _XOPEN_SOURCE 700
+
 #include <fcntl.h>
 #include <string.h>
 #include <sys/stat.h>
@@ -62,7 +64,7 @@ generateCode(int fd, String input, int c_mode)
 	if (c_mode) {
 		write(fd, input.data, input.len);
 	} else {
-		int i = -1;
+		size_t i = -1;
 		write(fd, "write(fd, \"", 11);
 		while (++i < input.len) {
 			if (*input.data == '\n')
@@ -76,13 +78,14 @@ generateCode(int fd, String input, int c_mode)
 static void
 generateC(int fd, String input)
 {
-	int c_mode, i, li;
+	int c_mode;
+	size_t i, li;
 	String ibuf;
 	c_mode = 0;
 
 	ibuf.data = input.data;
 	ibuf.len = input.len;
-	for (i = 0; i < input.len; ++i) {
+	for (i = li = 0; i < input.len; ++i) {
 		if (input.data[i] == '%') {
 			ibuf.len = ++i - li - 1;
 			generateCode(fd, ibuf, c_mode);
@@ -98,7 +101,7 @@ generateC(int fd, String input)
 static String
 getVariableValue(char *v)
 {
-	size_t n;
+	ssize_t n;
 	String s = { .data = v, .len = strlen(v) };
 	n = vss;
 	while (--n >= 0) {
@@ -120,7 +123,8 @@ main(int argc, char *argv[])
 	/* Variables: */
 	/* File names and file descriptors */
 	char *inputfn = NULL, *outputfn = NULL, *templatefn = NULL;
-	int inputfd, outputfd, templatefd, viter;
+	int inputfd, outputfd, templatefd;
+	size_t viter;
 
 	/* Read bytes (from nextline()/write()) */
 	ssize_t rb;
@@ -185,8 +189,9 @@ main(int argc, char *argv[])
 			if (*(readinput.data) == '#'); /* comment */
 			else { /* variable */
 				String tok;
-				if (Strtok(readinput, &tok, '=') <= 0)
+				if (Strtok(readinput, &tok, '=') <= 0) {
 					/* TODO: return syntax error */;
+				}
 				vs[vss].name.data = (idata + (parseinput.data - idata) + 1);
 				vs[vss].name.len = tok.len;
 				vs[vss].value.data = (idata + (parseinput.data - idata) + 1) + (tok.len + 1);

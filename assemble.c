@@ -28,11 +28,12 @@ size_t vss; /* Variable stack size */
 String
 getVariableValue(char *v)
 {
-	size_t n;
+	ssize_t n;
 	String s = { .data = v, .len = strlen(v) };
 	n = vss;
 	while (--n >= 0) {
 		if (!Strcmp(vs[n].name, s))
 			return vs[n].value;
 	}
+	return s; /* TODO: make the function returning pointer and return NULL */
 }
