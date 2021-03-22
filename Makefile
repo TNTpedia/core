@@ -31,7 +31,7 @@ pages: generator
 SRCLIB = util.c
 OBJLIB = ${SRCLIB:.c=.o}
 
-SRC = generate.c
+SRC = compile.c
 EXE = ${SRC:.c=}
 
 generator: buildoptions ${EXE} assemble.o
@@ -70,7 +70,7 @@ OUTDIR = out/
 OUTDIRS = $(subst $(METADIR),$(OUTDIR),$(METADIRS))
 OUT = $(subst $(METADIR),$(OUTDIR),$(BIN:.bin=.html))
 
-GENERATOR = ./generate
+GENERATOR = ./compile
 
 pages: ${OUT}
 
