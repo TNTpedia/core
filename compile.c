@@ -49,6 +49,7 @@ typedef struct {
 static void generateCode(int fd, String input, int c_mode);
 static void generateC(int fd, String input);
 static String getVariableValue(char *varname);
+static void preprocess(String input, String *output);
 static void usage(void);
 
 /* Globals */
@@ -107,6 +108,39 @@ getVariableValue(char *v)
 	while (--n >= 0) {
 		if (!Strcmp(vs[n].name, s))
 			return vs[n].value;
+	}
+}
+
+static void
+preprocess(String input, String *output)
+{
+	String parseinput;
+	char *idata = input.data;
+
+	while (Strtok(input, &parseinput, '\n') > 0) {
+		if (*(input.data) == '@' && *(input.data + 1) != '@') {
+			++input.data;
+			if (*(input.data) == '#'); /* comment */
+			else { /* variable */
+				String tok;
+				if (Strtok(input, &tok, '=') <= 0) {
+					/* TODO: return syntax error */;
+				}
+				vs[vss].name.data = (idata + (parseinput.data - idata) + 1);
+				vs[vss].name.len = tok.len;
+				vs[vss].value.data = (idata + (parseinput.data - idata) + 1) + (tok.len + 1);
+				vs[vss].value.len = parseinput.len - (tok.len + 1) - 1;
+				vs[vss].name = Strtrim(vs[vss].name);
+				vs[vss].value = Strtrim(vs[vss].value);
+				++vss;
+			}
+			--input.data;
+		} else {
+			strncat((*output).data, input.data, MIN(BUFFER_SIZE - (*output).len, parseinput.len + 1));
+			(*output).len += parseinput.len;
+		}
+		input.data += parseinput.len + 1;
+		input.len -= parseinput.len;
 	}
 }
 
@@ -183,31 +217,8 @@ main(int argc, char *argv[])
 	readinput.data = idata;
 	readinput.len  = rb;
 
-	while (Strtok(readinput, &parseinput, '\n') > 0) {
-		if (*(readinput.data) == '@' && *(readinput.data + 1) != '@') {
-			++readinput.data;
-			if (*(readinput.data) == '#'); /* comment */
-			else { /* variable */
-				String tok;
-				if (Strtok(readinput, &tok, '=') <= 0) {
-					/* TODO: return syntax error */;
-				}
-				vs[vss].name.data = (idata + (parseinput.data - idata) + 1);
-				vs[vss].name.len = tok.len;
-				vs[vss].value.data = (idata + (parseinput.data - idata) + 1) + (tok.len + 1);
-				vs[vss].value.len = parseinput.len - (tok.len + 1) - 1;
-				vs[vss].name = Strtrim(vs[vss].name);
-				vs[vss].value = Strtrim(vs[vss].value);
-				++vss;
-			}
-			--readinput.data;
-		} else {
-			strncat(input.data, readinput.data, MIN(BUFFER_SIZE - input.len, parseinput.len + 1));
-			input.len += parseinput.len;
-		}
-		readinput.data += parseinput.len + 1;
-		readinput.len -= parseinput.len;
-	}
+	/* Actual preprocessing */
+	preprocess(readinput, &input);
 
 	/* Closing an input */
 	close(inputfd);
