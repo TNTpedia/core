@@ -1,6 +1,6 @@
 compile
-templates
-in
+in/*
+templates/*
 meta
 out
 *.o
