@@ -60,7 +60,7 @@ static void generateCode(int fd, String input, int c_mode);
 static void generateC(int fd, String input);
 static Variable *getVariableByName(char *v);
 static String getVariableValue(char *varname);
-static void preprocess(String input, String *output);
+static void preprocess(int inputfd, String *output);
 static void usage(void);
 
 /* Globals */
@@ -129,18 +129,30 @@ getVariableValue(char *v)
 }
 
 static void
-preprocess(String input, String *output)
+preprocess(int inputfd, String *output)
 {
-	String parseinput;
-	char *idata = input.data;
+	String parseinput, readinput;
+	char idata[BUFFER_SIZE];
+	ssize_t rb;
 
-	while (Strtok(input, &parseinput, '\n') > 0) {
-		if (*(input.data) == '@' && *(input.data + 1) != '@') {
-			++input.data;
-			if (*(input.data) == '#'); /* comment */
+	/* Reading data */
+	if ((rb = read(inputfd, idata, BUFFER_SIZE)) < 0)
+		die("read (input):");
+
+	/* Setting readinput variables */
+	readinput.data = idata;
+	readinput.len  = rb;
+
+	/* Zeroing first byte of an output data */
+	*(output->data) = '\0';
+
+	while (Strtok(readinput, &parseinput, '\n') > 0) {
+		if (*(readinput.data) == '@' && *(readinput.data + 1) != '@') {
+			++readinput.data;
+			if (*(readinput.data) == '#'); /* comment */
 			else { /* variable */
 				String tok;
-				if (Strtok(input, &tok, '=') <= 0) {
+				if (Strtok(readinput, &tok, '=') <= 0) {
 					/* TODO: return syntax error */;
 				}
 				vs[vss].name.data = (idata + (parseinput.data - idata) + 1);
@@ -151,13 +163,13 @@ preprocess(String input, String *output)
 				vs[vss].value = Strtrim(vs[vss].value);
 				++vss;
 			}
-			--input.data;
+			--readinput.data;
 		} else {
-			strncat((*output).data, input.data, MIN(BUFFER_SIZE - (*output).len, parseinput.len + 1));
+			strncat((*output).data, readinput.data, MIN(BUFFER_SIZE - (*output).len, parseinput.len + 1));
 			(*output).len += parseinput.len;
 		}
-		input.data += parseinput.len + 1;
-		input.len -= parseinput.len;
+		readinput.data += parseinput.len + 1;
+		readinput.len -= parseinput.len;
 	}
 }
 
@@ -172,9 +184,14 @@ template(int outputfd, String templatename)
 {
 	size_t vsscopy;
 	char tname[sizeof TEMPLATEDIR + 256];
+	char input_buf[BUFFER_SIZE];
 	int fd;
 	String function = $(function);
 	String fun_iden = Striden(templatename);
+	String input = {
+		.data = input_buf,
+		.len = 0
+	};
 
 	/* Saving stack size */
 	vsscopy = vss;
@@ -191,7 +208,8 @@ template(int outputfd, String templatename)
 	write(outputfd, "void ", 5);
 	write(outputfd, fun_iden.data, fun_iden.len);
 	write(outputfd, "(void) {\n", 9);
-	/* preprocess(readinput, &input); */
+	preprocess(fd, &input);
+	generateC(outputfd, input);
 	write(outputfd, "}\n", 2);
 
 	/* Restoring stack size */
@@ -211,23 +229,20 @@ main(int argc, char *argv[])
 	int inputfd, outputfd;
 	size_t viter;
 
-	/* Read bytes (from nextline()/write()) */
-	ssize_t rb;
-
 	/* Input data */
-	char input_buf[BUFFER_SIZE], idata[BUFFER_SIZE];
+	char input_buf[BUFFER_SIZE];
 
 	String input = {
 		.data = input_buf,
 		.len = 0
-	}, readinput, parseinput;
+	}, caller;
 
 	/* Options parsing */
 	ARGBEGIN {
 	case 'o':
 		outputfn = ARGF(); break;
 	case 'v':
-		die("generate-"VERSION); break;
+		die("compile from stacinhtml-"VERSION); break;
 	default:
 		  usage(); break;
 	} ARGEND
@@ -252,22 +267,8 @@ main(int argc, char *argv[])
 	if ((inputfd = open(inputfn, O_RDONLY)) < 0)
 		die("open (input):");
 
-	/* Zeroing first byte of input data */
-	*(input.data) = '\0';
-
-	/* Initially, readinput points to beginning of all input */
-	readinput.data = input.data;
-	readinput.len = input.len;
-
-	/* Reading data */
-	if ((rb = read(inputfd, idata, BUFFER_SIZE)) < 0)
-		die("read (input):");
-
-	readinput.data = idata;
-	readinput.len  = rb;
-
 	/* Actual preprocessing */
-	preprocess(readinput, &input);
+	preprocess(inputfd, &input);
 
 	/* Closing an input */
 	close(inputfd);
@@ -297,11 +298,8 @@ main(int argc, char *argv[])
 	STACKPOP();
 
 	write(outputfd, "\nint main(void) {\n\t", 19);
-	/* We assign that to parseinput, because it is variable
-	   that is unused in this place, so we will not create
-	   another temporary variable */
-	parseinput = Striden($(template));
-	write(outputfd, parseinput.data, parseinput.len);
+	caller = Striden($(template));
+	write(outputfd, caller.data, caller.len);
 	write(outputfd, "();\n}\n", 6);
 
 	/* Closing an output */
