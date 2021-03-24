@@ -167,14 +167,48 @@ usage(void)
 	die("usage: %s [-v] [-o OUTPUT] INPUT [TEMPLATE]", argv0);
 }
 
+static void
+template(int outputfd, String templatename)
+{
+	size_t vsscopy;
+	char tname[sizeof TEMPLATEDIR + 256];
+	int fd;
+	String function = $(function);
+	String fun_iden = Striden(templatename);
+
+	/* Saving stack size */
+	vsscopy = vss;
+	/* Declaring function name as templatename */
+	DECLVAR_S(function, fun_iden);
+
+	strcpy(tname, TEMPLATEDIR);
+	strncpy(tname + (sizeof TEMPLATEDIR - 1), templatename.data, MIN(templatename.len, 256));
+
+	/* Opening template */
+	if ((fd = open(tname, O_RDONLY)) < 0)
+		die("open (template '%s'):", tname);
+
+	write(outputfd, "void ", 5);
+	write(outputfd, fun_iden.data, fun_iden.len);
+	write(outputfd, "(void) {\n", 9);
+	/* preprocess(readinput, &input); */
+	write(outputfd, "}\n", 2);
+
+	/* Restoring stack size */
+	vss = vsscopy;
+
+	/* Closing template */
+	close(fd);
+}
+
 /* Main */
 int
 main(int argc, char *argv[])
 {
 	/* Variables: */
 	/* File names and file descriptors */
-	char *inputfn = NULL, *outputfn = NULL, *templatefn = NULL;
-	int inputfd, outputfd, templatefd;
+	char *inputfn = NULL, *outputfn = NULL;
+	int inputfd, outputfd;
 	size_t viter;
 
 	/* Read bytes (from nextline()/write()) */
@@ -201,13 +235,18 @@ main(int argc, char *argv[])
 	/* Argument parsing */
 	if (argc == 1)
 		inputfn = argv[0];
-	else if (argc == 2)
-		templatefn = argv[1];
 	else
 		usage();
 
 	if (outputfn == NULL) /* TODO */
 		die("output not specified (needed in current stage)");
+
+	/* Setting variable stack size to 0 */
+	vss = 0;
+
+	/* Declaring a few variables */
+	DECLVAR(title, outputfn);
+	DECLVAR(template, "basic.stac");
 
 	/* Opening an input */
 	if ((inputfd = open(inputfn, O_RDONLY)) < 0)
@@ -216,18 +255,11 @@ main(int argc, char *argv[])
 	/* Zeroing first byte of input data */
 	*(input.data) = '\0';
 
-	/* Setting variable stack size to 0 */
-	vss = 0;
-
 	/* Initially, readinput points to beginning of all input */
 	readinput.data = input.data;
 	readinput.len = input.len;
 
-	/* Declaring a few variables */
-	DECLVAR(title, outputfn);
-	DECLVAR(template, templatefn);
-
-	/* Parsing ("preprocessing") input for variables */
+	/* Reading data */
 	if ((rb = read(inputfd, idata, BUFFER_SIZE)) < 0)
 		die("read (input):");
 
@@ -240,14 +272,12 @@ main(int argc, char *argv[])
 	/* Closing an input */
 	close(inputfd);
 
-	/* Here will be some templates replacing */
-
 	/* Opening an output */
 	if ((outputfd = open(outputfn, O_WRONLY | O_CREAT, 0644)) < 0)
 		die("open (output):");
 
-	/* Writing beginning of main() */
-	write(outputfd, "#include <assemble.h>\nint main(void) {", 38);
+	/* Writing beginning of content() */
+	write(outputfd, "#include <assemble.h>\nvoid content(void) {", 42);
 
 	/* Declaring variables */
 	for (viter = 0; viter < vss; ++viter)
@@ -255,11 +285,24 @@ main(int argc, char *argv[])
 				vs[viter].name.len,  vs[viter].name.data,
 				vs[viter].value.len, vs[viter].value.data);
 
-	/* And finally, generating C code to output */
+	/* And after that, generating C code to output */
 	generateC(outputfd, input);
 
-	/* After this, closing main() */
+	/* After this, closing content() */
 	write(outputfd, "\n}", 2);
+
+	/* And finally adding templates */
+	DECLVAR(function, "content");
+	template(outputfd, getVariableByName("template")->value);
+	STACKPOP();
+
+	write(outputfd, "\nint main(void) {\n\t", 19);
+	/* We assign that to parseinput, because it is variable
+	   that is unused in this place, so we will not create
+	   another temporary variable */
+	parseinput = Striden($(template));
+	write(outputfd, parseinput.data, parseinput.len);
+	write(outputfd, "();\n}\n", 6);
 
 	/* Closing an output */
 	close(outputfd);
