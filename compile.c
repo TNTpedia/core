@@ -32,10 +32,20 @@
 
 /* Macros */
 #define $(VARNAME) getVariableValue(#VARNAME)
+#define $$(VARNAME) write(fd, $(VARNAME).data, $(VARNAME).len);
 #define DECLVAR(VARNAME, VALUE) \
 	(vs[vss].name.len = strlen(vs[vss].name.data = #VARNAME), \
 	 vs[vss].value.len = strlen(vs[vss].value.data = VALUE == NULL ? "<null>" : VALUE), \
 	 ++vss)
+#define DECLVAR_S(VARNAME, VALUE) \
+	(vs[vss].name.len = strlen(vs[vss].name.data = #VARNAME), \
+	 vs[vss].value = VALUE, \
+	 ++vss)
+#define DECLVAR_N(VARNAME, VALUE, N) \
+	(vs[vss].name.len = strlen(vs[vss].name.data = #VARNAME), \
+	 vs[vss].value = VALUE, vs[vss].len = N, \
+	 ++vss)
+#define STACKPOP() --vss
 #define BUFFER_SIZE 64 * 1024
 #define VS_MAX 256
 
@@ -48,6 +58,7 @@ typedef struct {
 /* Prototypes */
 static void generateCode(int fd, String input, int c_mode);
 static void generateC(int fd, String input);
+static Variable *getVariableByName(char *v);
 static String getVariableValue(char *varname);
 static void preprocess(String input, String *output);
 static void usage(void);
@@ -99,16 +110,22 @@ generateC(int fd, String input)
 	generateCode(fd, ibuf, c_mode);
 }
 
-static String
-getVariableValue(char *v)
+static Variable *
+getVariableByName(char *v)
 {
 	ssize_t n;
 	String s = { .data = v, .len = strlen(v) };
 	n = vss;
 	while (--n >= 0) {
 		if (!Strcmp(vs[n].name, s))
-			return vs[n].value;
+			return vs + n;
 	}
+}
+
+static String
+getVariableValue(char *v)
+{
+	return getVariableByName(v)->value;
 }
 
 static void
