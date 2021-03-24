@@ -31,6 +31,7 @@ typedef struct {
 static String toString(char *s);
 static int Strcmp(String a, String b);
 static ssize_t Strtok(String string, String *out, char c);
+static String Striden(String string);
 static String Strtrim(String str);
 
 static String
@@ -58,6 +59,18 @@ Strtok(String string, String *out, char c)
 	string.len = tmpptr - string.data;
 	*out = string;
 	return (tmpptr - string.data);
+}
+
+static String
+Striden(String str)
+{
+	size_t i;
+	for (i = 0; ((str.data[i] >= 'a' && str.data[i] <= 'z')
+				|| (str.data[i] >= 'A' && str.data[i] <= 'Z')
+				|| (str.data[i] && str.data[i] >= '0' && str.data[i] <= '9'))
+				&& (i < str.len); ++i);
+	str.len = i;
+	return str;
 }
 
 static String
