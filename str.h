@@ -53,10 +53,13 @@ static ssize_t
 Strtok(String string, String *out, char c)
 {
 	char *tmpptr = string.data;
-	while ((unsigned)(tmpptr - string.data) < string.len) {
-		if (*(++tmpptr) == c) break;
-	}
-	string.len = tmpptr - string.data;
+
+	if (!string.len) return *out = string, 0;
+	if (*(tmpptr) != c)
+		while ((unsigned)(tmpptr - string.data) <= string.len) {
+			if (*(++tmpptr) == c) break;
+		}
+	string.len = ++tmpptr - string.data;
 	*out = string;
 	return (tmpptr - string.data);
 }
