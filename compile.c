@@ -147,12 +147,27 @@ preprocess(int inputfd, String *output)
 	*(output->data) = '\0';
 
 	while (Strtok(readinput, &parseinput, '\n') > 0) {
-		if (*(readinput.data) == '@' && *(readinput.data + 1) != '@') {
-			++readinput.data;
-			if (*(readinput.data) == '#'); /* comment */
-			else { /* variable */
+		if (*(parseinput.data) == '@' && *(parseinput.data + 1) != '@') {
+			++parseinput.data;
+			if (*(parseinput.data) == '#'); /* comment */
+			else if (*(parseinput.data) == '<') { /* do something special */
+				++parseinput.data;
+				if (!strncmp(parseinput.data, "###", 3)) {
+					String function;
+					strncat((*output).data, "%",
+							MIN(BUFFER_SIZE - ((*output).len)++, 1));
+					function = $(function);
+					strncat((*output).data, function.data,
+							MIN(BUFFER_SIZE - (*output).len, function.len));
+					(*output).len += function.len;
+					strncat((*output).data, "();%",
+							MIN(BUFFER_SIZE - ((*output).len)++, 4));
+					(*output).len += 3;
+				}
+				--parseinput.data;
+			} else { /* variable */
 				String tok;
-				if (Strtok(readinput, &tok, '=') <= 0) {
+				if (Strtok(parseinput, &tok, '=') <= 0) {
 					/* TODO: return syntax error */;
 				}
 				vs[vss].name.data = (idata + (parseinput.data - idata) + 1);
@@ -163,12 +178,13 @@ preprocess(int inputfd, String *output)
 				vs[vss].value = Strtrim(vs[vss].value);
 				++vss;
 			}
-			--readinput.data;
+			--parseinput.data;
 		} else {
-			strncat((*output).data, readinput.data, MIN(BUFFER_SIZE - (*output).len, parseinput.len + 1));
+			strncat((*output).data, readinput.data,
+					MIN(BUFFER_SIZE - (*output).len, parseinput.len));
 			(*output).len += parseinput.len;
 		}
-		readinput.data += parseinput.len + 1;
+		readinput.data += parseinput.len;
 		readinput.len -= parseinput.len;
 	}
 }
@@ -196,10 +212,10 @@ template(int outputfd, String templatename)
 	/* Saving stack size */
 	vsscopy = vss;
 	/* Declaring function name as templatename */
-	DECLVAR_S(function, fun_iden);
+	/* DECLVAR_S(function, fun_iden); TODO: recursive templates handling */
 
 	strcpy(tname, TEMPLATEDIR);
-	strncpy(tname + (sizeof TEMPLATEDIR - 1), templatename.data, MIN(templatename.len, 256));
+	strncpy(tname + (sizeof TEMPLATEDIR - 1), templatename.data, MIN(templatename.len + 1, 256));
 
 	/* Opening template */
 	if ((fd = open(tname, O_RDONLY)) < 0)
