@@ -296,12 +296,6 @@ main(int argc, char *argv[])
 	/* Writing beginning of content() */
 	write(outputfd, "#include <assemble.h>\nvoid content(void) {", 42);
 
-	/* Declaring variables */
-	for (viter = 0; viter < vss; ++viter)
-		dprintf(outputfd, "DECLVAR(%.*s, \"%.*s\"); ",
-				vs[viter].name.len,  vs[viter].name.data,
-				vs[viter].value.len, vs[viter].value.data);
-
 	/* And after that, generating C code to output */
 	generateC(outputfd, input);
 
@@ -313,9 +307,20 @@ main(int argc, char *argv[])
 	template(outputfd, getVariableByName("template")->value);
 	STACKPOP();
 
+	/* main() beginning */
 	write(outputfd, "\nint main(void) {\n\t", 19);
+
+	/* Declaring variables */
+	for (viter = 0; viter < vss; ++viter)
+		dprintf(outputfd, "DECLVAR(%.*s, \"%.*s\"); ",
+				vs[viter].name.len,  vs[viter].name.data,
+				vs[viter].value.len, vs[viter].value.data);
+
+	/* calling function */
 	caller = Striden($(template));
 	write(outputfd, caller.data, caller.len);
+
+	/* main() ending */
 	write(outputfd, "();\n}\n", 6);
 
 	/* Closing an output */
