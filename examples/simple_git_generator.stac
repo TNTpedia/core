@@ -1,0 +1,4 @@
+@title = Repository log
+
+<h1>Log of repository % system("pwd"); %</h1>
+<pre>% system("git log"); %</pre>
