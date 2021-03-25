@@ -57,16 +57,13 @@ ${OBJLIB}: ${SRCLIB}
 
 # == Section 2: Generating pages ==
 
-INDIR = in/
 INDIRS = $(sort $(shell find $(INDIR)/ -type d))
 IN = $(sort $(shell find $(INDIR)/ -type f -name '*.stac'))
 
-METADIR = meta/
 METADIRS = $(subst $(INDIR),$(METADIR),$(INDIRS))
 META = $(subst $(INDIR),$(METADIR),$(IN:.stac=.c))
 BIN = $(META:.c=.bin)
 
-OUTDIR = out/
 OUTDIRS = $(subst $(METADIR),$(OUTDIR),$(METADIRS))
 OUT = $(subst $(METADIR),$(OUTDIR),$(BIN:.bin=.html))
 
