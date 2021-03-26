@@ -60,14 +60,16 @@ static void generateCode(int fd, String input, int c_mode);
 static void generateC(int fd, String input);
 static Variable *getVariableByName(char *v);
 static String getVariableValue(char *varname);
-static void preprocess(int inputfd, String *output);
+static void preprocess(int outputfd, int inputfd, String *output);
 static void usage(void);
 
 /* Globals */
 char *argv0;
 
-Variable vs[VS_MAX]; /* Variable stack */
-size_t vss; /* Variable stack size */
+static Variable vs[VS_MAX]; /* Variable stack */
+static size_t vss; /* Variable stack size */
+static char buffer[8192]; /* Buffer for persistent things like variables */
+static char *bufptr; /* Pointer to usable space in buffer */
 
 /* Functions */
 static void
@@ -129,7 +131,7 @@ getVariableValue(char *v)
 }
 
 static void
-preprocess(int inputfd, String *output)
+preprocess(int outputfd, int inputfd, String *output)
 {
 	String parseinput, readinput;
 	char idata[BUFFER_SIZE];
@@ -163,6 +165,8 @@ preprocess(int inputfd, String *output)
 					strncat((*output).data, "();%",
 							MIN(BUFFER_SIZE - ((*output).len)++, 4));
 					(*output).len += 3;
+				} else {
+					write(outputfd, parseinput.data, parseinput.len - 2);
 				}
 				--parseinput.data;
 			} else { /* variable */
@@ -170,10 +174,16 @@ preprocess(int inputfd, String *output)
 				if (Strtok(parseinput, &tok, '=') <= 0) {
 					/* TODO: return syntax error */;
 				}
-				vs[vss].name.data = (idata + (parseinput.data - idata) + 1);
-				vs[vss].name.len = tok.len;
-				vs[vss].value.data = (idata + (parseinput.data - idata) + 1) + (tok.len + 1);
+				strncpy(bufptr, (idata + (parseinput.data - idata)),
+						MIN(tok.len - 1, 8192 - (bufptr - buffer)));
+				vs[vss].name.data = bufptr;
+				vs[vss].name.len = tok.len - 1;
+				bufptr += tok.len - 1;
+				strncpy(bufptr, (idata + (parseinput.data - idata)) + (tok.len + 1),
+						MIN(parseinput.len - (tok.len + 1) - 1, 8192 - (bufptr - buffer)));
+				vs[vss].value.data = bufptr;
 				vs[vss].value.len = parseinput.len - (tok.len + 1) - 1;
+				bufptr += parseinput.len - (tok.len + 1) - 1;
 				vs[vss].name = Strtrim(vs[vss].name);
 				vs[vss].value = Strtrim(vs[vss].value);
 				++vss;
@@ -198,7 +208,7 @@ usage(void)
 static void
 template(int outputfd, String templatename)
 {
-	size_t vsscopy;
+	size_t vsscopy, viter;
 	char tname[sizeof TEMPLATEDIR + 256];
 	char input_buf[BUFFER_SIZE];
 	int fd;
@@ -221,10 +231,20 @@ template(int outputfd, String templatename)
 	if ((fd = open(tname, O_RDONLY)) < 0)
 		die("open (template '%s'):", tname);
 
+	/* Preprocessing */
+	preprocess(outputfd, fd, &input);
+
 	write(outputfd, "void ", 5);
 	write(outputfd, fun_iden.data, fun_iden.len);
 	write(outputfd, "(void) {\n", 9);
-	preprocess(fd, &input);
+
+	/* Declaring variables */
+	for (viter = vsscopy; viter < vss; ++viter)
+		dprintf(outputfd, "DECLVAR(%.*s, \"%.*s\"); ",
+				vs[viter].name.len,  vs[viter].name.data,
+				vs[viter].value.len, vs[viter].value.data);
+
+	/* Generating C code */
 	generateC(outputfd, input);
 	write(outputfd, "}\n", 2);
 
@@ -274,6 +294,7 @@ main(int argc, char *argv[])
 
 	/* Setting variable stack size to 0 */
 	vss = 0;
+	bufptr = buffer;
 
 	/* Declaring a few variables */
 	DECLVAR(title, outputfn);
@@ -283,15 +304,15 @@ main(int argc, char *argv[])
 	if ((inputfd = open(inputfn, O_RDONLY)) < 0)
 		die("open (input):");
 
-	/* Actual preprocessing */
-	preprocess(inputfd, &input);
-
-	/* Closing an input */
-	close(inputfd);
-
 	/* Opening an output */
 	if ((outputfd = open(outputfn, O_WRONLY | O_CREAT, 0644)) < 0)
 		die("open (output):");
+
+	/* Actual preprocessing */
+	preprocess(outputfd, inputfd, &input);
+
+	/* Closing an input */
+	close(inputfd);
 
 	/* Writing beginning of content() */
 	write(outputfd, "#include <assemble.h>\nvoid content(void) {", 42);
