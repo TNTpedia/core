@@ -166,6 +166,7 @@ preprocess(int outputfd, int inputfd, String *output)
 							MIN(BUFFER_SIZE - ((*output).len)++, 4));
 					(*output).len += 3;
 				} else {
+					write(outputfd, "\n", 1);
 					write(outputfd, parseinput.data, parseinput.len - 2);
 				}
 				--parseinput.data;
