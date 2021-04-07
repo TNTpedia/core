@@ -28,13 +28,13 @@ pages: generator
 
 # == Section 1: Building a generator ==
 
-SRCLIB = util.c
+SRCLIB = util.c assemble.c str.c
 OBJLIB = ${SRCLIB:.c=.o}
 
 SRC = compile.c
 EXE = ${SRC:.c=}
 
-generator: buildoptions ${EXE} assemble.o
+generator: buildoptions ${EXE}
 
 buildoptions:
 	@echo build options:
@@ -73,10 +73,13 @@ pages: ${OUT}
 
 ${OUT}: ${META}
 ${META}: ${IN}
-${IN}: mkpagedirs
+${IN}: ${METADIRS} ${OUTDIRS}
 
-mkpagedirs:
-	mkdir -p $(OUTDIRS) $(METADIRS)
+${OUTDIRS}: ${METADIRS}
+	mkdir -p $(OUTDIRS)
+
+${METADIRS}: ${INDIRS}
+	mkdir -p $(METADIRS)
 
 ${IN}: generator ${GENERATOR}
 
@@ -84,7 +87,7 @@ ${METADIR}/%.c: ${INDIR}/%.stac
 	${GENERATOR} -o $@ $(subst $(METADIR),$(INDIR),$(@:.c=.stac))
 
 ${METADIR}/%.bin: ${METADIR}/%.c
-	${CC} -o $@ -I. $(@:.bin=.c) assemble.o
+	${CC} -o $@ -I. $(@:.bin=.c) ${OBJLIB}
 
 ${OUTDIR}/%.html: ${METADIR}/%.bin
 	./$(subst $(OUTDIR),$(METADIR),$(@:.html=.bin)) > $@
