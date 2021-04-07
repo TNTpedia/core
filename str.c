@@ -18,23 +18,9 @@
 
 */
 
-#ifndef _STR_H
-#define _STR_H
+#include "str.h"
 
-#include <ctype.h>
-
-typedef struct {
-	char *data;
-	size_t len;
-} String;
-
-static String toString(char *s);
-static int Strcmp(String a, String b);
-static ssize_t Strtok(String string, String *out, char c);
-static String Striden(String string);
-static String Strtrim(String str);
-
-static String
+String
 toString(char *s)
 {
 	String ret;
@@ -42,14 +28,14 @@ toString(char *s)
 	return ret;
 }
 
-static int
+int
 Strcmp(String a, String b)
 {
 	if (a.len != b.len) return -1;
 	return strncmp(a.data, b.data, a.len);
 }
 
-static ssize_t
+ssize_t
 Strtok(String string, String *out, char c)
 {
 	char *tmpptr = string.data;
@@ -64,7 +50,7 @@ Strtok(String string, String *out, char c)
 	return (tmpptr - string.data);
 }
 
-static String
+String
 Striden(String str)
 {
 	size_t i;
@@ -76,7 +62,7 @@ Striden(String str)
 	return str;
 }
 
-static String
+String
 Strtrim(String str)
 {
 	size_t i = 0;
@@ -89,5 +75,3 @@ Strtrim(String str)
 		--str.len;
 	return str;
 }
-
-#endif

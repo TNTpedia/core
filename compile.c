@@ -21,6 +21,7 @@
 #define _XOPEN_SOURCE 700
 
 #include <fcntl.h>
+#include <stdio.h>
 #include <string.h>
 #include <sys/stat.h>
 #include <sys/types.h>
@@ -85,7 +86,7 @@ generateCode(int fd, String input, int c_mode)
 				dprintf(fd, "\"\n\"");
 			dprintf(fd, "\\x%02x", *(input.data++));
 		}
-		dprintf(fd, "\", %d);", input.len);
+		dprintf(fd, "\", %ld);", input.len);
 	}
 }
 
@@ -122,12 +123,20 @@ getVariableByName(char *v)
 		if (!Strcmp(vs[n].name, s))
 			return vs + n;
 	}
+	return NULL;
 }
 
 static String
 getVariableValue(char *v)
 {
-	return getVariableByName(v)->value;
+	Variable *var = getVariableByName(v);
+	if (var == NULL) {
+		String s = {
+			.len = 0
+		};
+		return s;
+	}
+	return var->value;
 }
 
 static void
@@ -213,7 +222,7 @@ template(int outputfd, String templatename)
 	char tname[sizeof TEMPLATEDIR + 256];
 	char input_buf[BUFFER_SIZE];
 	int fd;
-	String function = $(function);
+	/* String function = $(function); -- unused, maybe will for later? */
 	String fun_iden = Striden(templatename);
 	String input = {
 		.data = input_buf,
@@ -242,8 +251,8 @@ template(int outputfd, String templatename)
 	/* Declaring variables */
 	for (viter = vsscopy; viter < vss; ++viter)
 		dprintf(outputfd, "DECLVAR(%.*s, \"%.*s\"); ",
-				vs[viter].name.len,  vs[viter].name.data,
-				vs[viter].value.len, vs[viter].value.data);
+				(int)vs[viter].name.len,  vs[viter].name.data,
+				(int)vs[viter].value.len, vs[viter].value.data);
 
 	/* Generating C code */
 	generateC(outputfd, input);
@@ -335,8 +344,8 @@ main(int argc, char *argv[])
 	/* Declaring variables */
 	for (viter = 0; viter < vss; ++viter)
 		dprintf(outputfd, "DECLVAR(%.*s, \"%.*s\"); ",
-				vs[viter].name.len,  vs[viter].name.data,
-				vs[viter].value.len, vs[viter].value.data);
+				(int)vs[viter].name.len,  vs[viter].name.data,
+				(int)vs[viter].value.len, vs[viter].value.data);
 
 	/* calling function */
 	caller = Striden($(template));
