@@ -18,6 +18,7 @@
 #define fd 1 /* stdout */
 
 #define echo(STRING) write(fd, (STRING), sizeof(STRING) - 1)
+#define PERCENT write(fd, "\x25", 1);
 
 ssize_t print(char *what);
 int lsprintf(char *fmt, ...);
