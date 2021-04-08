@@ -1,12 +1,12 @@
 # basics
 MAJORVERSION = 0
-SUBVERSION   = 1
-PATCHLEVEL   = 1
+SUBVERSION   = 2
+PATCHLEVEL   = 0
 BUILDNAME    = vanilla
 
 VERSION = ${MAJORVERSION}.${SUBVERSION}.${PATCHLEVEL}-${BUILDNAME}
 
-# directories
+# directories (KEEP TRAILING SLASH!)
 INDIR = in/
 METADIR = meta/
 OUTDIR = out/
