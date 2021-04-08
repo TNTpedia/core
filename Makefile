@@ -28,7 +28,7 @@ pages: generator
 
 # == Section 1: Building a generator ==
 
-SRCLIB = util.c assemble.c str.c
+SRCLIB = util.c assemble.c str.c libstac/libstac.c
 OBJLIB = ${SRCLIB:.c=.o}
 
 SRC = compile.c
@@ -57,8 +57,8 @@ ${OBJLIB}: ${SRCLIB}
 
 # == Section 2: Generating pages ==
 
-INDIRS = $(sort $(shell find $(INDIR)/ -type d))
-IN = $(sort $(shell find $(INDIR)/ -type f -name '*.stac'))
+INDIRS = $(sort $(shell find $(INDIR) -type d))
+IN = $(sort $(shell find $(INDIR) -type f -name '*.stac'))
 
 METADIRS = $(subst $(INDIR),$(METADIR),$(INDIRS))
 META = $(subst $(INDIR),$(METADIR),$(IN:.stac=.c))
@@ -69,11 +69,11 @@ OUT = $(subst $(METADIR),$(OUTDIR),$(BIN:.bin=.html))
 
 GENERATOR = ./compile
 
+pages:
+
 pages: ${OUT}
 
-${OUT}: ${META}
-${META}: ${IN}
-${IN}: ${METADIRS} ${OUTDIRS}
+${OUT}: ${OUTDIRS}
 
 ${OUTDIRS}: ${METADIRS}
 	mkdir -p $(OUTDIRS)
@@ -83,13 +83,13 @@ ${METADIRS}: ${INDIRS}
 
 ${IN}: generator ${GENERATOR}
 
-${METADIR}/%.c: ${INDIR}/%.stac
+${METADIR}%.c: ${INDIR}%.stac
 	${GENERATOR} -o $@ $(subst $(METADIR),$(INDIR),$(@:.c=.stac))
 
-${METADIR}/%.bin: ${METADIR}/%.c
+${METADIR}%.bin: ${METADIR}%.c
 	${CC} -o $@ -I. $(@:.bin=.c) ${OBJLIB}
 
-${OUTDIR}/%.html: ${METADIR}/%.bin
+${OUTDIR}%.html: ${METADIR}%.bin
 	./$(subst $(OUTDIR),$(METADIR),$(@:.html=.bin)) > $@
 
 clean:
