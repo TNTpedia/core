@@ -60,12 +60,12 @@ ${OBJLIB}: ${SRCLIB}
 INDIRS = $(sort $(shell find $(INDIR) -type d))
 IN = $(sort $(shell find $(INDIR) -type f -name '*.stac'))
 
-METADIRS = $(subst $(INDIR),$(METADIR),$(INDIRS))
-META = $(subst $(INDIR),$(METADIR),$(IN:.stac=.c))
+METADIRS = $(patsubst $(INDIR)%,$(METADIR)%,$(INDIRS))
+META = $(patsubst $(INDIR)%,$(METADIR)%,$(IN:.stac=.c))
 BIN = $(META:.c=.bin)
 
-OUTDIRS = $(subst $(METADIR),$(OUTDIR),$(METADIRS))
-OUT = $(subst $(METADIR),$(OUTDIR),$(BIN:.bin=.html))
+OUTDIRS = $(patsubst $(METADIR)%,$(OUTDIR)%,$(METADIRS))
+OUT = $(patsubst $(METADIR)%,$(OUTDIR)%,$(BIN:.bin=.html))
 
 GENERATOR = ./compile
 
@@ -84,13 +84,13 @@ ${METADIRS}: ${INDIRS}
 ${IN}: generator ${GENERATOR}
 
 ${METADIR}%.c: ${INDIR}%.stac
-	${GENERATOR} -o $@ $(subst $(METADIR),$(INDIR),$(@:.c=.stac))
+	${GENERATOR} -o $@ $(patsubst $(METADIR)%,$(INDIR)%,$(@:.c=.stac))
 
 ${METADIR}%.bin: ${METADIR}%.c
 	${CC} -o $@ -I. $(@:.bin=.c) ${OBJLIB}
 
 ${OUTDIR}%.html: ${METADIR}%.bin
-	./$(subst $(OUTDIR),$(METADIR),$(@:.html=.bin)) > $@
+	./$(patsubst $(OUTDIR)%,$(METADIR)%,$(@:.html=.bin)) > $@
 
 clean:
 	rm -f ${OBJLIB} ${EXE} *.o
