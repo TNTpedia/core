@@ -318,6 +318,9 @@ main(int argc, char *argv[])
 	if ((outputfd = open(outputfn, O_WRONLY | O_CREAT, 0644)) < 0)
 		die("open (output):");
 
+	/* On the beginning, we are going to include assemble.h */
+	write(outputfd, "#include <assemble.h>\n", 22);
+
 	/* Actual preprocessing */
 	preprocess(outputfd, inputfd, &input);
 
@@ -325,7 +328,7 @@ main(int argc, char *argv[])
 	close(inputfd);
 
 	/* Writing beginning of content() */
-	write(outputfd, "#include <assemble.h>\nvoid content(void) {", 42);
+	write(outputfd, "void content(void) {", 20);
 
 	/* And after that, generating C code to output */
 	generateC(outputfd, input);
