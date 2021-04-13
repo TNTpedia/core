@@ -20,6 +20,8 @@
 
 #include "str.h"
 
+/* String functions */
+
 String
 toString(char *s)
 {
@@ -33,6 +35,13 @@ Strcmp(String a, String b)
 {
 	if (a.len != b.len) return -1;
 	return strncmp(a.data, b.data, a.len);
+}
+
+int
+Strcmpc(String s1, char *s2)
+{
+	if (s1.len != strlen(s2)) return -1;
+	return strncmp(s1.data, s2, s1.len);
 }
 
 ssize_t
@@ -74,4 +83,20 @@ Strtrim(String str)
 	while (isspace(*(str.data + (str.len - 1))))
 		--str.len;
 	return str;
+}
+
+/* Array functions */
+int
+_inArray(char *data, size_t len, void *val, size_t vlen)
+{
+	size_t i, n;
+	for (n = i = 0; i < len; ++i, data += vlen)
+		if (!memcmp(data, val, vlen)) ++n;
+	return (int)n;
+}
+
+void *
+_prepareArray(void *data, size_t siz)
+{
+	return memset(data, 0, siz);
 }
