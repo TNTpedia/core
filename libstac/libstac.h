@@ -19,6 +19,7 @@
 
 #define echo(STRING) write(fd, (STRING), sizeof(STRING) - 1)
 #define PERCENT write(fd, "\x25", 1);
+#define MODULO %
 
 ssize_t print(char *what);
 ssize_t nprint(char *what, size_t n);
