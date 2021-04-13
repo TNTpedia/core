@@ -21,6 +21,7 @@
 #define PERCENT write(fd, "\x25", 1);
 
 ssize_t print(char *what);
+ssize_t nprint(char *what, size_t n);
 int lsprintf(char *fmt, ...);
 
 #endif

@@ -6,6 +6,12 @@ print(char *what)
 	return write(fd, what, strlen(what));
 }
 
+ssize_t
+nprint(char *what, size_t n)
+{
+	return write(fd, what, n);
+}
+
 int
 lsprintf(char *fmt, ...)
 {
