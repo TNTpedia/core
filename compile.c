@@ -84,7 +84,7 @@ generateCode(int fd, String input, int c_mode)
 		while (++i < input.len) {
 			if (*input.data == '\n')
 				dprintf(fd, "\"\n\"");
-			dprintf(fd, "\\x%02x", *(input.data++));
+			dprintf(fd, "\\%03o", *(input.data++));
 		}
 		dprintf(fd, "\", %ld);", input.len);
 	}
