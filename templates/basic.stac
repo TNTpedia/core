@@ -3,7 +3,7 @@
 	<head>
 		<meta charset="UTF-8" />
 		<title>%$$(title)% - TNTpedia</title>
-		<link rel="stylesheet" href="%$(ROOTDIR)%/data/main.css" />
+		<link rel="stylesheet" href="%$$(ROOTDIR)%/data/main.css" />
 	</head>
 
 	<div id="panel">
