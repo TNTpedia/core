@@ -80,11 +80,14 @@ generateCode(int fd, String input, int c_mode)
 		write(fd, input.data, input.len);
 	} else {
 		size_t i = -1;
+		unsigned char c = 0;
 		write(fd, "write(fd, \"", 11);
 		while (++i < input.len) {
+			c = (unsigned)(*input.data);
 			if (*input.data == '\n')
 				dprintf(fd, "\"\n\"");
-			dprintf(fd, "\\%03o", *(input.data++));
+			dprintf(fd, "\\%03o", c);
+			++input.data;
 		}
 		dprintf(fd, "\", %ld);", input.len);
 	}
