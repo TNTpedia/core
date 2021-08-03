@@ -9,7 +9,7 @@ VERSION = ${MAJORVERSION}.${SUBVERSION}.${PATCHLEVEL}-${BUILDNAME}
 # directories (KEEP TRAILING SLASH!)
 INDIR = in/
 METADIR = meta/
-OUTDIR = wiki/
+OUTDIR = html/wiki/
 TEMPLATEDIR = templates/
 
 # flags
