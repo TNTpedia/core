@@ -7,7 +7,7 @@ a:visited       { color: #3f00b0; }
 a.dead          { color: #b00000; }
 
 #wikilogo {
-	background-image: url(/data/logo.png?dupa=hu);
+	background-image: url(/data/static/logo_light.png);
 }
 
 div#header > div {
