@@ -1,0 +1,13 @@
+#!/bin/sh
+
+CC=gcc
+
+make generator > /dev/null
+
+./compile $@ > /tmp/stac.$$.c &&
+	${CC} /tmp/stac.$$.c -o /tmp/stac.$$ -Iinclude -I. \
+		util.o assemble.o str.o libstac/libstac.o &&
+	/tmp/stac.$$
+
+rm /tmp/stac.$$.c
+rm /tmp/stac.$$
