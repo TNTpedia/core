@@ -10,11 +10,10 @@ VERSION = ${MAJORVERSION}.${SUBVERSION}.${PATCHLEVEL}-${BUILDNAME}
 INDIR = in/
 METADIR = meta/
 OUTDIR = out/
-TEMPLATEDIR = templates/
 
 # flags
-CFLAGS   = -std=c99 -Wall -Wextra -pedantic -Ofast
-CPPFLAGS = -D_XOPEN_SOURCE=700 -DVERSION=\"${VERSION}\" -DTEMPLATEDIR=\"${TEMPLATEDIR}\"
+CFLAGS   = -std=c99 -Wall -Wextra -pedantic -Ofast -Iinclude -I.
+CPPFLAGS = -D_XOPEN_SOURCE=700 -DVERSION=\"${VERSION}\"
 LDFLAGS  = -Ofast -static
 CCFLAGS  = ${CFLAGS} ${CPPFLAGS}
 

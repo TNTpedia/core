@@ -215,14 +215,14 @@ preprocess(int outputfd, int inputfd, String *output)
 static void
 usage(void)
 {
-	die("usage: %s [-v] [-o OUTPUT] INPUT [TEMPLATE]", argv0);
+	die("usage: %s [-v] [-t TEMPLATE] [-o OUTPUT] INPUT", argv0);
 }
 
 static void
 template(int outputfd, String templatename)
 {
 	size_t vsscopy, viter;
-	char tname[sizeof TEMPLATEDIR + 256];
+	char tname[4096];
 	char input_buf[BUFFER_SIZE];
 	int fd;
 	/* String function = $(function); -- unused, maybe will for later? */
@@ -237,8 +237,7 @@ template(int outputfd, String templatename)
 	/* Declaring function name as templatename */
 	/* DECLVAR_S(function, fun_iden); TODO: recursive templates handling */
 
-	strcpy(tname, TEMPLATEDIR);
-	strncpy(tname + (sizeof TEMPLATEDIR - 1), templatename.data, MIN(templatename.len + 1, 256));
+	strncpy(tname, templatename.data, sizeof tname - 1);
 
 	/* Opening template */
 	if ((fd = open(tname, O_RDONLY)) < 0)
@@ -274,7 +273,7 @@ main(int argc, char *argv[])
 {
 	/* Variables: */
 	/* File names and file descriptors */
-	char *inputfn = NULL, *outputfn = NULL;
+	char *inputfn = NULL, *outputfn = NULL, *templatename = NULL;
 	int inputfd = -1, outputfd = -1;
 	size_t viter;
 
@@ -290,6 +289,9 @@ main(int argc, char *argv[])
 	ARGBEGIN {
 	case 'o':
 		outputfn = ARGF(); break;
+	case 't':
+		templatename = ARGF();
+		break;
 	case 'v':
 		die("compile from stac-"VERSION); break;
 	default:
@@ -313,7 +315,9 @@ main(int argc, char *argv[])
 
 	/* Declaring a few variables */
 	DECLVAR(title, inputfn);
-	DECLVAR(template, "basic.stac");
+	/* DECLVAR(template, templatename == NULL ? "templates/basic.stac" : templatename); */
+	if (templatename != NULL)
+		DECLVAR(template, templatename);
 
 	/* Opening an input */
 	if ((inputfd = open(inputfn, O_RDONLY)) < 0)
@@ -343,9 +347,11 @@ main(int argc, char *argv[])
 	write(outputfd, "\n}", 2);
 
 	/* And finally adding templates */
-	DECLVAR(function, "content");
-	template(outputfd, getVariableByName("template")->value);
-	STACKPOP();
+	if (templatename != NULL) {
+		DECLVAR(function, "content");
+		template(outputfd, getVariableByName("template")->value);
+		STACKPOP();
+	}
 
 	/* main() beginning */
 	write(outputfd, "\nint main(void) {\n\t", 19);
@@ -357,6 +363,9 @@ main(int argc, char *argv[])
 				(int)vs[viter].value.len, vs[viter].value.data);
 
 	/* calling function */
+	if (templatename == NULL) {
+		DECLVAR(template, "content");
+	}
 	caller = Striden($(template));
 	write(outputfd, caller.data, caller.len);
 
