@@ -1,0 +1,86 @@
+/* Infobox *******************************************************************/
+
+div.infobox {
+	float: right;
+	clear: both;
+	border: 1px solid #2a2a2a;
+	width: 250px;
+	margin: 0 0 1em 1em;
+}
+
+div.infobox > div {
+	padding: 0.5em 1em;
+	margin: 0;
+	border-top: 1px solid #2a2a2a;
+}
+
+div.infobox-title {
+	padding: 0.5em 1em;
+	border-top: none !important;
+	background-color: #0f0f0f;
+	text-align: center;
+	font-weight: bold;
+}
+
+div.infobox-subtitle {
+	padding: 0.5em 1em;
+	background-color: #0f0f0f;
+	text-align: center;
+	font-weight: bold;
+	font-size: 0.85em;
+}
+
+div.infobox-image {
+	background-color: #1d2021;
+	text-align: center;
+	font-size: 0.85em;
+}
+
+div.infobox-image > img {
+	padding: 0;
+	width: 100%;
+}
+
+div.infobox-table {
+	margin: 0 !important;
+	padding: 0 !important;
+}
+
+table.infobox-table {
+	border-spacing: 0;
+	border-collapse: collapse;
+	table-layout: fixed;
+	margin: 0;
+	border: 0;
+	border-top: 1px solid #2a2a2a;
+	font-size: 0.8em;
+	width: 100%
+}
+
+tr.infobox-table-row {
+	height: 100%;
+}
+tr.infobox-table-row > td {
+	height: 100%;
+	padding: 0.5em;
+}
+
+td.infobox-table-left {
+	background-color: #0a0a0a;
+	width: calc(40% - 1em);
+}
+
+td.infobox-table-right {
+	background-color: #000000;
+	width: calc(60% - 1em);
+}
+
+div.infobox-twitch          { background-color: #6441a5; }
+div.infobox-youtube         { background-color: #ff0000; }
+
+div.infobox-twitch a {
+	color: #ffffff;
+}
+div.infobox-youtube a {
+	color: #ffffff;
+}

@@ -1,0 +1,17 @@
+/* Infobox *******************************************************************/
+
+div.imagine {
+	float: right;
+	clear: both;
+	border: 1px solid #afafaf;
+	background-color: #ffffff;
+	text-align: center;
+	font-size: 0.85em;
+	width: 250px;
+	margin: 0 0 1em 1em;
+}
+
+div.imagine > img {
+	padding: 0;
+	width: 100%;
+}

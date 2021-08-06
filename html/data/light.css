@@ -1,0 +1,60 @@
+html, body {
+	background-color: #f7f7f7;
+}
+
+a               { color: #0000b0; }
+a:visited       { color: #3f00b0; }
+a.dead          { color: #b00000; }
+
+#wikilogo {
+	background-image: url(/data/logo.png?dupa=hu);
+}
+
+div#header > div {
+	border: 1px solid #afdfff;
+	border-bottom-color: #afdfff;
+	background-color: #ebebeb;
+}
+
+div#header > div.active {
+	border-bottom-color: #ffffff;
+	background-color: #ffffff;
+}
+
+div#content {
+	border: 1px solid #afdfff;
+	background-color: #ffffff;
+}
+
+div#content h1 {
+	border-bottom: 1px solid #afafaf;
+}
+
+div#content h2 {
+	border-bottom: 1px solid #afafaf;
+}
+
+div.box {
+	background-color: #efefef;
+	border: 1px solid #cccccc;
+}
+
+div.minibox {
+	background-color: #efefef;
+	border: 1px solid #cccccc;
+}
+
+.zloty-artykul-gradient {
+	background: linear-gradient(103deg, #e11701, #d58f09);
+	color: #ebdbb2;
+}
+
+.srebrny-artykul-gradient {
+	background: linear-gradient(103deg, #abbaab, #ffffff);
+	color: #0f0f0f;
+}
+
+.brazowy-artykul-gradient {
+	background: linear-gradient(103deg, #d08809, #ad6e2d);
+	color: #ebdbb2;
+}
