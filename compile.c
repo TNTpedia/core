@@ -27,9 +27,9 @@
 #include <sys/types.h>
 #include <unistd.h>
 
-#include "arg.h"
-#include "str.h"
-#include "util.h"
+#include <arg.h>
+#include <str.h>
+#include <util.h>
 
 /* Macros */
 #define $(VARNAME) getVariableValue(#VARNAME)

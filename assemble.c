@@ -18,7 +18,7 @@
 
 */
 
-#include "assemble.h"
+#include <assemble.h>
 
 /* Globals */
 Variable vs[VS_MAX]; /* Variable stack */
