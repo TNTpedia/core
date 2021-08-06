@@ -1,28 +1,36 @@
+@ROOTDIR = //tntpedia.xyz/
+
 <!DOCTYPE html>
 <html>
 	<head>
 		<meta charset="UTF-8" />
 		<title>%$$(title)% - TNTpedia</title>
-		<link rel="stylesheet" href="%$$(ROOTDIR)%/data/main.css" />
+		<link rel="stylesheet" href="%$$(ROOTDIR)%/data/main.css?shasum=% system("sha1sum /var/www/tntpedia/html/data/main.css"); %" />
+		<link rel="stylesheet" href="%$$(ROOTDIR)%/data/dark.css?shasum=% system("sha1sum /var/www/tntpedia/html/data/dark.css"); %" />
 	</head>
 
 	<div id="panel">
-		<div id="wikilogo"></div>
-		<div class="panel_item"><a href="/" class="smaller">Strona główna</a></div>
-		<div class="panel_item"><a href="/" class="smaller">Losuj artykuł</a></div>
+		<a href="%$$(ROOTDIR)%/wiki/Strona_główna" class="smaller"><div id="wikilogo"></div></a>
+		<div class="panel_item"><a href="%$$(ROOTDIR)%/wiki/Strona_główna" class="smaller">Strona główna</a></div>
+		<div class="panel_item"><a href="%$$(ROOTDIR)%/wiki/Specjalna:Losuj" class="smaller">Losowa strona</a></div>
+		<div class="panel_item"><a href="%$$(ROOTDIR)%/wiki/Specjalna:Szukaj" class="smaller">Wyszukiwarka</a></div>
 	</div>
 
 	<div id="container">
-		<div id="userpanel">
+		<!--div id="userpanel">
 			<span style="color: #7f7f7f">Nie jesteś zalogowany</span>
-		</div>
+		</div-->
+		<br />
 
 		<div id="header">
-			<!-- Left ----------------------------------->
+			<!-- Left ******************************** -->
 			<div class="active">%$$(title)%</div>
-			<!-- Right ---------------------------------->
-			<div style="float: right">Kod źródłowy</div>
-			<!------------------------------------------->
+			<!-- Right ******************************* -->
+			<div style="float: right"><a href="%$$(ROOTDIR)%/wiki/Specjalna:Kod?artykul=%
+				system("basename $SCRIPT_NAME");
+			%">Kod źródłowy</a></div>
+			<div style="float: right"><a href="%$$(ROOTDIR)%/wiki/Specjalna:Szukaj">Wyszukiwarka</a></div>
+			<!-- ************************************* -->
 			<div style="clear: both; display: none"></div>
 		</div>
 
