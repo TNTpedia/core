@@ -275,7 +275,7 @@ main(int argc, char *argv[])
 	/* Variables: */
 	/* File names and file descriptors */
 	char *inputfn = NULL, *outputfn = NULL;
-	int inputfd, outputfd;
+	int inputfd = -1, outputfd = -1;
 	size_t viter;
 
 	/* Input data */
@@ -302,24 +302,27 @@ main(int argc, char *argv[])
 	else
 		usage();
 
-	if (outputfn == NULL) /* TODO */
-		die("output not specified (needed in current stage)");
+	if (outputfn == NULL) {
+		outputfn = "/dev/stdout";
+		outputfd = STDOUT_FILENO;
+	}
 
 	/* Setting variable stack size to 0 */
 	vss = 0;
 	bufptr = buffer;
 
 	/* Declaring a few variables */
-	DECLVAR(title, outputfn);
+	DECLVAR(title, inputfn);
 	DECLVAR(template, "basic.stac");
 
 	/* Opening an input */
 	if ((inputfd = open(inputfn, O_RDONLY)) < 0)
 		die("open (input):");
 
-	/* Opening an output */
-	if ((outputfd = open(outputfn, O_WRONLY | O_CREAT, 0644)) < 0)
-		die("open (output):");
+	/* Opening an output (checking if outputfd == -1; otherwise it have stdout file descriptor) */
+	if (outputfd == -1)
+		if ((outputfd = open(outputfn, O_WRONLY | O_CREAT, 0644)) < 0)
+			die("open (output):");
 
 	/* On the beginning, we are going to include assemble.h */
 	write(outputfd, "#include <assemble.h>\n", 22);
