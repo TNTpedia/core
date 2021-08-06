@@ -1,5 +1,5 @@
 #
-# stacinhtml - STAtic C IN HTML - simple static site generator
+# stac - simple static site generator
 # Copyright (C) 2021  Kacper Kocot <kocotian@kocotian.pl>
 #
 # This program is free software; you can redistribute it and/or modify
@@ -21,8 +21,9 @@
 
 include config.mk
 
-all: pages
-pages: generator
+all: generator
+# all: pages
+# pages: generator
 
 .PHONY: all pages generator
 
@@ -69,28 +70,28 @@ OUT = $(patsubst $(METADIR)%,$(OUTDIR)%,$(BIN:.bin=.html))
 
 GENERATOR = ./compile
 
-pages:
+# pages:
 
-pages: ${OUT}
+# pages: ${OUT}
 
-${OUT}: ${OUTDIRS}
+# ${OUT}: ${OUTDIRS}
 
-${OUTDIRS}: ${METADIRS}
-	mkdir -p $(OUTDIRS)
+# ${OUTDIRS}: ${METADIRS}
+# 	mkdir -p $(OUTDIRS)
 
-${METADIRS}: ${INDIRS}
-	mkdir -p $(METADIRS)
+# ${METADIRS}: ${INDIRS}
+# 	mkdir -p $(METADIRS)
 
-${IN}: generator ${GENERATOR}
+# ${IN}: generator ${GENERATOR}
 
-${METADIR}%.c: ${INDIR}%.stac
-	${GENERATOR} -o $@ $(patsubst $(METADIR)%,$(INDIR)%,$(@:.c=.stac))
+# ${METADIR}%.c: ${INDIR}%.stac
+# 	${GENERATOR} -o $@ $(patsubst $(METADIR)%,$(INDIR)%,$(@:.c=.stac))
 
-${METADIR}%.bin: ${METADIR}%.c
-	${CC} -o $@ -I. $(@:.bin=.c) ${OBJLIB}
+# ${METADIR}%.bin: ${METADIR}%.c
+# 	${CC} -o $@ -Iinclude -I. $(@:.bin=.c) ${OBJLIB}
 
-${OUTDIR}%.html: ${METADIR}%.bin
-	./$(patsubst $(OUTDIR)%,$(METADIR)%,$(@:.html=.bin)) > $@
+# ${OUTDIR}%.html: ${METADIR}%.bin
+# 	./$(patsubst $(OUTDIR)%,$(METADIR)%,$(@:.html=.bin)) > $@
 
 clean:
 	rm -f ${OBJLIB} ${EXE} *.o

@@ -5,8 +5,8 @@
 #include <stdio.h>
 #include <unistd.h>
 
-#include "../str.h"
-#include "../util.h"
+#include <str.h>
+#include <util.h>
 
 /* Macros */
 #define $(VARNAME) getVariableValue(#VARNAME)
