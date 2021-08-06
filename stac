@@ -2,12 +2,16 @@
 
 CC=gcc
 
-make generator > /dev/null
+make generator > /dev/null || exit 1
 
-./compile $@ > /tmp/stac.$$.c &&
-	${CC} /tmp/stac.$$.c -o /tmp/stac.$$ -Iinclude -I. \
-		util.o assemble.o str.o libstac/libstac.o &&
-	/tmp/stac.$$
+./compile $@ > /tmp/stac.$$.c || exit 1
 
+${CC} /tmp/stac.$$.c -o /tmp/stac.$$ -Iinclude -I. \
+	util.o assemble.o str.o libstac/libstac.o || {
+	rm /tmp/stac.$$.c
+	exit 1
+}
 rm /tmp/stac.$$.c
+
+/tmp/stac.$$
 rm /tmp/stac.$$
