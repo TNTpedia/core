@@ -27,9 +27,9 @@
 #include <sys/types.h>
 #include <unistd.h>
 
-#include "libstac/libstac.h"
-#include "str.h"
-#include "util.h"
+#include <libstac/libstac.h>
+#include <str.h>
+#include <util.h>
 
 /* Macros */
 #define VS_MAX 256

@@ -87,7 +87,7 @@ ${METADIR}%.c: ${INDIR}%.stac
 	${GENERATOR} -o $@ $(patsubst $(METADIR)%,$(INDIR)%,$(@:.c=.stac))
 
 ${METADIR}%.bin: ${METADIR}%.c
-	${CC} -o $@ -I. $(@:.bin=.c) ${OBJLIB}
+	${CC} -o $@ -Iinclude -I. $(@:.bin=.c) ${OBJLIB}
 
 ${OUTDIR}%.html: ${METADIR}%.bin
 	./$(patsubst $(OUTDIR)%,$(METADIR)%,$(@:.html=.bin)) > $@
