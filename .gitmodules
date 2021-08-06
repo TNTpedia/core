@@ -1,6 +1,8 @@
 [submodule "html/data/static"]
 	path = html/data/static
 	url = git@github.com:TNTpedia/static
+	branch = master
 [submodule "in"]
 	path = in
 	url = git@github.com:TNTpedia/articles
+	branch = master
