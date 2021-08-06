@@ -1,5 +1,5 @@
 /*
-   stacinhtml - STAtic C IN HTML - simple static site generator
+   stac - simple static site generator
    Copyright (C) 2021  Kacper Kocot <kocotian@kocotian.pl>
 
    This program is free software; you can redistribute it and/or modify

@@ -12,8 +12,8 @@
 			"\">this</a> page.\n"
 		"\t<!\x2d\x2d";
 		char cwd[4096], out[(sizeof msg / sizeof *msg) + 4097];
-		if (getcwd(cwd, 4096) == NULL)
-			strcpy(cwd, "(directory with stacinhtml here)");
+	if (getcwd(cwd, 4096) == NULL)
+			strcpy(cwd, "(directory with stac here)");
 		write(fd, out, sprintf(out, msg, cwd));
 	%-->
 </p>

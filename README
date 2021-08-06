@@ -1,7 +1,7 @@
-stacinhtml
-==========
+stac
+====
 
-Static C in HTML is a page generator wrote in C99 initially for my webpage.
+stac is a page generator wrote in C99 initially for my webpage.
 This is a simple "compiler" that takes HTML with nested C code on input, and
 produces HTML on output. Input and nesting C code was inspired by node.c
 created by Tsoding (https://github.com/tsoding/node.c).
