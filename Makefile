@@ -95,6 +95,6 @@ GENERATOR = ./compile
 
 clean:
 	rm -f ${OBJLIB} ${EXE} *.o
-	rm -rf ${METADIR} ${OUTDIR}
+	# rm -rf ${METADIR} ${OUTDIR}
 
 .PHONY: mkpagedirs clean
