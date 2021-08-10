@@ -39,9 +39,10 @@ div.panel_item {
 }
 
 div.panel_separator {
-	padding-left: 1em;
+	padding-left: 0.6em;
 	margin-top: 1.25em;
 	font-weight: bolder;
+	margin-left: calc(-0.6em - 2px);
 }
 
 /************/
