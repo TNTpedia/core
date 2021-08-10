@@ -10,6 +10,11 @@ a.dead          { color: #b00000; }
 	background-image: url(/data/static/logo_light.png);
 }
 
+div.panel_separator {
+	color: #4f4f4f;
+	border-left: 2px solid #afafaf;
+}
+
 div#header > div {
 	border: 1px solid #afdfff;
 	border-bottom-color: #afdfff;

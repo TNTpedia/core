@@ -38,6 +38,12 @@ div.panel_item {
 	padding-top: 0.25em;
 }
 
+div.panel_separator {
+	padding-left: 1em;
+	padding-top: 1.25em;
+	font-weight: bolder;
+}
+
 /************/
 div#container {
 	margin-left: 10em;
