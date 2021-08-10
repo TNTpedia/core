@@ -29,10 +29,10 @@
 		<div id="header">
 			<!-- Left ******************************** -->
 			<div class="header-left active">%$$(title)%</div>
-			<div class="header-left"><a href="https://github.com/TNTpedia/articles/edit/master/%
-				system("basename $SCRIPT_NAME");
-			%.stac">Edytuj</a></div>
 			<!-- Right ******************************* -->
+			<div class="header-right"><a href="https://github.com/TNTpedia/articles/edit/master/%
+				system("basename $SCRIPT_NAME");
+			%.stac">Zaproponuj zmiany</a></div>
 			<div class="header-right"><a href="%$$(ROOTDIR)%/wiki/Specjalna:Kod?artykul=%
 				system("basename $SCRIPT_NAME");
 			%">Kod źródłowy</a></div>
