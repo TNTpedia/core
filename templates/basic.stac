@@ -14,6 +14,10 @@
 		<div class="panel_item"><a href="%$$(ROOTDIR)%/wiki/Strona_główna" class="smaller">Strona główna</a></div>
 		<div class="panel_item"><a href="%$$(ROOTDIR)%/wiki/Specjalna:Losuj" class="smaller">Losowa strona</a></div>
 		<div class="panel_item"><a href="%$$(ROOTDIR)%/wiki/Specjalna:Szukaj" class="smaller">Wyszukiwarka</a></div>
+		<div class="panel_item"><a href="https://github.com/TNTpedia/articles/new/master" class="smaller">Utwórz artykuł</a></div>
+		<!-- ************************************* -->
+		<div class="panel_item"><div class="panel_separator">Dla czytelników</div></div>
+		<div class="panel_item"><a href="https://github.com/TNTpedia/core/issues" class="smaller">Zgłoś błąd</a></div>
 	</div>
 
 	<div id="container">
