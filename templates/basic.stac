@@ -25,6 +25,9 @@
 		<div id="header">
 			<!-- Left ******************************** -->
 			<div class="active">%$$(title)%</div>
+			<div><a href="https://github.com/TNTpedia/articles/edit/master/%
+				system("basename $SCRIPT_NAME");
+			%.stac">Edytuj artykuł</a></div>
 			<!-- Right ******************************* -->
 			<div style="float: right"><a href="%$$(ROOTDIR)%/wiki/Specjalna:Kod?artykul=%
 				system("basename $SCRIPT_NAME");
