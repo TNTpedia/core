@@ -40,7 +40,7 @@ div.panel_item {
 
 div.panel_separator {
 	padding-left: 1em;
-	padding-top: 1.25em;
+	margin-top: 1.25em;
 	font-weight: bolder;
 }
 
