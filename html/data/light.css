@@ -63,3 +63,7 @@ div.minibox {
 	background: linear-gradient(103deg, #d08809, #ad6e2d);
 	color: #ebdbb2;
 }
+
+blockquote.cytat {
+    border-left: 2px solid #1d2021;
+}

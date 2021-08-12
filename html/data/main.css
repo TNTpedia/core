@@ -150,3 +150,10 @@ table.table td {
 	background-color: #0a0a0a;
 	border: 1px solid #2a2a2a;
 }
+
+blockquote.cytat {
+    margin: 0.75em 0.5em;
+    margin-left: 0;
+    padding: 0.25em 0;
+    padding-left: 1em;
+}
