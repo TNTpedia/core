@@ -3,18 +3,32 @@
 
 #include <functions/libwiki.c>
 
+static int cssincluded = 0;
+
 void
-imagine(char *url, char *about)
+imagine_begin(void)
 {
-	lsprintf("<link rel=\"stylesheet\" href=\"/data/imagine.css?shasum=");
+	if (!cssincluded) {
+		lsprintf("<link rel=\"stylesheet\" href=\"/data/imagine.css?shasum=");
+		cssincluded = 1;
+	}
 	system("sha1sum /var/www/tntpedia/html/data/imagine.css");
 	lsprintf("\" />");
 
-	lsprintf("\t<div class=\"imagine\"><img src=\"/data/static/%s\" />", url);
-	if (about != NULL) {
-		lsprintf("%s", about);
-	}
+	lsprintf("\t<div class=\"imagine\">");
+}
+
+void
+imagine_end(void)
+{
 	lsprintf("\t</div>");
+}
+
+#define imagine(URL, ...) { \
+	imagine_begin(); \
+	lsprintf("<img src=\"/data/static/%s\" />", URL); \
+	__VA_ARGS__; \
+	imagine_end(); \
 }
 
 #endif
